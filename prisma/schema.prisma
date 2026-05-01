@@ -1,0 +1,147 @@
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//////////////////////////////////////////////////////
+// ENUMS
+//////////////////////////////////////////////////////
+enum App {
+  UBER
+  NINETY_NINE
+  INDRIVE
+  IFOOD
+  NINETY_NINE_FOOD
+  SHOPEE
+  GENERIC_DELIVERY
+  OTHER
+}
+
+enum ExpenseType {
+  FUEL
+  FOOD
+  MAINTENANCE
+  MARKET
+  TOLLS
+  PARKING
+  OTHER
+}
+
+//////////////////////////////////////////////////////
+// MODELS
+//////////////////////////////////////////////////////
+model Day {
+  id          String   @id @default(cuid())
+  clerkId     String
+
+  /**
+   * Fecha NORMALIZADA (00:00:00 UTC)
+   * CRÍTICO para evitar duplicados
+   */
+  date        DateTime @db.Date
+
+  /**
+   * Métricas del día
+   */
+  hours       Int
+  kilometers  Decimal  @db.Decimal(10, 2)
+
+  /**
+   * Relaciones
+   */
+  earnings    Earning[]
+  expenses    Expense[]
+
+  /**
+   * Agregados (performance dashboard)
+   */
+  totalEarnings Decimal @db.Decimal(12, 2) @default(0)
+  totalExpenses Decimal @db.Decimal(12, 2) @default(0)
+  netProfit     Decimal @db.Decimal(12, 2) @default(0)
+
+  /**
+   * Control
+   */
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  /**
+   * Índices
+   */
+  @@index([clerkId])
+  @@index([date])
+  @@index([clerkId, date])
+
+  /**
+   * Unicidad por usuario + día
+   */
+  @@unique([clerkId, date])
+}
+
+model Earning {
+  id        String   @id @default(cuid())
+
+  dayId     String
+  app       App
+
+  /**
+   * Dinero SIEMPRE decimal
+   */
+  amount    Decimal  @db.Decimal(10, 2)
+
+  /**
+   * Relación
+   */
+  day       Day      @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /**
+   * Índices para analytics
+   */
+  @@index([dayId])
+  @@index([app])
+  @@index([dayId, app])
+
+  /**
+   * 1 app por día
+   */
+  @@unique([dayId, app])
+}
+
+model Expense {
+  id        String   @id @default(cuid())
+
+  dayId     String
+  type      ExpenseType
+
+  /**
+   * Dinero
+   */
+  amount    Decimal  @db.Decimal(10, 2)
+
+  /**
+   * Nota opcional controlada
+   */
+  note      String?  @db.VarChar(255)
+
+  /**
+   * Relación
+   */
+  day       Day      @relation(fields: [dayId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  /**
+   * Índices
+   */
+  @@index([dayId])
+  @@index([type])
+  @@index([dayId, type])
+}
