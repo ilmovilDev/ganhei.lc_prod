@@ -1,11 +1,13 @@
+import { ErrorCode } from "./error-codes";
+
 export class AppError extends Error {
-  public readonly code: string;
+  public readonly code: ErrorCode;
   public readonly statusCode: number;
   public readonly context?: Record<string, unknown>;
 
   constructor(params: {
     message: string;
-    code: string;
+    code: ErrorCode;
     statusCode?: number;
     context?: Record<string, unknown>;
   }) {

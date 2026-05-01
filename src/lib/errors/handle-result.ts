@@ -1,6 +1,6 @@
 import { Result } from "@/types/result.type";
 import { AppError } from "./app-error";
-import { ErrorCodes } from "./error-codes";
+import { ErrorCode, ErrorCodes } from "./error-codes";
 
 /**
  * Wraps any async fn into a typed Result<T>.
@@ -16,7 +16,7 @@ export async function handleResult<T>(
     if (error instanceof AppError) {
       return {
         success: false,
-        error: { message: error.message, code: error.code },
+        error: { message: error.message, code: error.code as ErrorCode },
       };
     }
 
