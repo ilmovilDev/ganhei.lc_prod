@@ -1,6 +1,7 @@
 import Header from "@/components/shared/header/header";
 import { AppSidebar } from "@/components/ui/app-sidebar";
 import { SidebarProvider } from "@/components/ui/sidebar";
+import { Suspense } from "react";
 
 export default function ProtectedLayout({
   children,
@@ -9,7 +10,9 @@ export default function ProtectedLayout({
 }>) {
   return (
     <SidebarProvider>
-      <AppSidebar />
+      <Suspense fallback={null}>
+        <AppSidebar />
+      </Suspense>
       <main className="no-scrollbar flex w-full flex-1 flex-col overflow-auto">
         <Header />
         {children}
