@@ -1,21 +1,23 @@
-import { requireUserOrRedirect } from "@/lib/auth/require-user-or-redirect";
-import { normalizeMonth } from "@/lib/helpers/normalize-month";
 import DashboardMetricsContent from "@/modules/dashboard/components/dashboard-metrics-content";
-import HeaderDashboard from "@/modules/dashboard/components/header-dashboard";
+import { getCurrentMonth, getCurrentYear } from "@/lib/date/current-period";
+import HeaderPage from "@/components/shared/header/header-page";
 
-export default async function Dashboard({
+interface DashboardPageProps {
+  searchParams: Promise<{ month?: string; year?: string }>;
+}
+
+export default async function DashboardPage({
   searchParams,
-}: {
-  searchParams: Promise<{ month?: string }>;
-}) {
-  await requireUserOrRedirect();
-  const params = await searchParams;
-  const month = normalizeMonth(params?.month);
+}: DashboardPageProps) {
+  const { month, year } = await searchParams;
+
+  const currentMonth = month ?? getCurrentMonth();
+  const currentYear = year ?? getCurrentYear();
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      <HeaderDashboard month={month} />
-      <DashboardMetricsContent month={month} />
+    <div className="flex h-full flex-col gap-y-4 overflow-hidden p-4">
+      <HeaderPage month={currentMonth} year={currentYear} />
+      <DashboardMetricsContent month={currentMonth} year={currentYear} />
     </div>
   );
 }

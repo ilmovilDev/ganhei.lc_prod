@@ -7,7 +7,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 
 export default function Header() {
   return (
-    <header className="bg-background flex h-14 items-center justify-between px-4">
+    <header className="bg-background flex h-12 items-center justify-between px-4">
       <div className="flex w-full items-center gap-x-2">
         <SidebarTrigger />
         <div className="md:hidden">

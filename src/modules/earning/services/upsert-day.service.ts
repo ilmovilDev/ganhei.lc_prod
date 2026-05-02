@@ -3,7 +3,7 @@ import { Prisma } from "@/generated/prisma/client";
 import { App } from "@/generated/prisma/enums";
 import { AppError } from "@/lib/errors/app-error";
 import { ErrorCodes } from "@/lib/errors/error-codes";
-import { normalizeToMidnight } from "@/lib/db/normalize-date";
+import { normalizeToMidnight } from "@/lib/date/normalize-date";
 import { DayFormData } from "../schemas/day.schema";
 
 // ─── private helpers ────────────────────────────────────────────────────────

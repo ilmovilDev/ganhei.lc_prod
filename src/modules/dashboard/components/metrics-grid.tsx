@@ -6,7 +6,7 @@ import { formatCurrency } from "@/lib/helpers/format-currency";
 import MetricCard from "./metric-card";
 import MetricCardSkeleton from "./metric-card-skeleton";
 
-const GRID = "grid grid-cols-2 gap-3 px-4 py-2 md:grid-cols-auto-fit-cards";
+const GRID = "grid grid-cols-2 gap-3 md:grid-cols-auto-fit-cards";
 const FULL_ROW = "col-span-2 md:col-span-1"; // highlight ocupa linha no mobile
 const SINGLE = "col-span-1";
 

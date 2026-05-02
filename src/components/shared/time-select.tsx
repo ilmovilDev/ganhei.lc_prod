@@ -1,20 +1,18 @@
 "use client";
 
-import { useEffect, useMemo, useTransition } from "react";
+import { useTransition } from "react";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
 } from "@/components/ui/select";
-
-import { useRouter, useSearchParams, usePathname } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { Calendar } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-/**
- * Meses normalizados (SIEMPRE 2 dígitos)
- */
+// ── constants ────────────────────────────────────────────────────────────────
+
 const MONTH_OPTIONS = [
   { value: "01", label: "Janeiro" },
   { value: "02", label: "Fevereiro" },
@@ -34,116 +32,132 @@ type MonthValue = (typeof MONTH_OPTIONS)[number]["value"];
 
 const VALID_MONTHS = new Set(MONTH_OPTIONS.map((m) => m.value));
 
-/**
- * Devuelve mes actual en formato "MM"
- */
+function buildYearOptions(): { value: string; label: string }[] {
+  const current = new Date().getFullYear();
+  return Array.from({ length: 3 }, (_, i) => {
+    const y = String(current - i);
+    return { value: y, label: y };
+  });
+}
+
+const YEAR_OPTIONS = buildYearOptions();
+const VALID_YEARS = new Set(YEAR_OPTIONS.map((y) => y.value));
+
+// ── helpers ──────────────────────────────────────────────────────────────────
+
 function getCurrentMonth(): MonthValue {
-  const now = new Date();
-  return String(now.getMonth() + 1).padStart(2, "0") as MonthValue;
+  return String(new Date().getMonth() + 1).padStart(2, "0") as MonthValue;
 }
 
-/**
- * Normaliza cualquier valor de entrada a "MM" válido
- */
-function normalizeMonth(value: string | null | undefined): MonthValue | null {
-  if (!value) return null;
+function getCurrentYear(): string {
+  return String(new Date().getFullYear());
+}
 
-  // Ej: "4" -> "04"
+function normalizeMonth(value: string | undefined): MonthValue {
+  if (!value) return getCurrentMonth();
   const normalized = value.padStart(2, "0");
-
-  if (VALID_MONTHS.has(normalized as MonthValue))
-    return normalized as MonthValue;
-
-  return null;
+  return VALID_MONTHS.has(normalized as MonthValue)
+    ? (normalized as MonthValue)
+    : getCurrentMonth();
 }
 
-type TimeSelectProps = {
-  /**
-   * Valor proveniente del server (searchParams)
-   */
+function normalizeYear(value: string | undefined): string {
+  if (!value) return getCurrentYear();
+  return VALID_YEARS.has(value) ? value : getCurrentYear();
+}
+
+// ── component ────────────────────────────────────────────────────────────────
+
+interface TimeSelectProps {
   month?: string;
-};
+  year?: string;
+}
 
-export default function TimeSelect({ month }: TimeSelectProps) {
+export default function TimeSelect({ month, year }: TimeSelectProps) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const pathname = usePathname();
-
   const [isPending, startTransition] = useTransition();
 
-  const currentMonth = useMemo(() => {
-    const fromProp = normalizeMonth(month);
-    if (fromProp) return fromProp;
+  const currentMonth = normalizeMonth(month);
+  const currentYear = normalizeYear(year);
 
-    const fromUrl = normalizeMonth(searchParams.get("month"));
-    if (fromUrl) return fromUrl;
-
-    return getCurrentMonth();
-  }, [month, searchParams]);
-
-  useEffect(() => {
-    const urlMonthRaw = searchParams.get("month");
-    const urlMonth = normalizeMonth(urlMonthRaw);
-
-    // Si ya es válido y coincide → no hacer nada
-    if (urlMonth === currentMonth) return;
-
-    const params = new URLSearchParams(searchParams.toString());
-    params.set("month", currentMonth);
+  function navigate(newMonth: string, newYear: string) {
+    const params = new URLSearchParams();
+    params.set("month", newMonth);
+    params.set("year", newYear);
 
     startTransition(() => {
       router.replace(`${pathname}?${params.toString()}`);
     });
-  }, [currentMonth, pathname, router, searchParams]);
+  }
 
-  /**
-   * 3. Cambio manual del usuario
-   */
-  const handleChange = (value: string) => {
+  const handleMonthChange = (value: string) => {
     if (!VALID_MONTHS.has(value as MonthValue)) return;
+    if (value === currentMonth) return;
+    navigate(value, currentYear);
+  };
 
-    const params = new URLSearchParams(searchParams.toString());
-
-    // Evita navegación innecesaria
-    if (params.get("month") === value) return;
-
-    params.set("month", value);
-
-    startTransition(() => {
-      router.replace(`${pathname}?${params.toString()}`);
-    });
+  const handleYearChange = (value: string) => {
+    if (!VALID_YEARS.has(value)) return;
+    if (value === currentYear) return;
+    navigate(currentMonth, value);
   };
 
   const selectedMonthLabel =
     MONTH_OPTIONS.find((m) => m.value === currentMonth)?.label ?? "Selecionar";
 
   return (
-    <Select value={currentMonth} onValueChange={handleChange}>
-      <SelectTrigger
-        className={cn(
-          "flex h-10 w-full md:w-fit",
-          "bg-background border px-2 shadow-sm",
-          isPending && "opacity-70",
-        )}
+    <div className="flex items-center gap-2">
+      <Select
+        value={currentYear}
+        onValueChange={handleYearChange}
         disabled={isPending}
       >
-        <div className="flex items-center gap-2">
-          <Calendar className="text-muted-foreground h-4 w-4" />
+        <SelectTrigger
+          className={cn(
+            "h-10 w-24",
+            "bg-background border px-2 shadow-sm",
+            isPending && "opacity-70",
+          )}
+        >
+          <span className="text-sm font-medium">{currentYear}</span>
+        </SelectTrigger>
 
-          <span className="text-sm font-medium">{selectedMonthLabel}</span>
-        </div>
-      </SelectTrigger>
+        <SelectContent position="popper">
+          {YEAR_OPTIONS.map((y) => (
+            <SelectItem key={y.value} value={y.value}>
+              {y.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
 
-      <SelectContent
-        position="popper"
-        className="w-[--radix-select-trigger-width]"
+      <Select
+        value={currentMonth}
+        onValueChange={handleMonthChange}
+        disabled={isPending}
       >
-        {MONTH_OPTIONS.map((m) => (
-          <SelectItem key={m.value} value={m.value}>
-            {m.label}
-          </SelectItem>
-        ))}
-      </SelectContent>
-    </Select>
+        <SelectTrigger
+          className={cn(
+            "h-10 w-full md:w-fit",
+            "bg-background border px-2 shadow-sm",
+            isPending && "opacity-70",
+          )}
+        >
+          <div className="flex items-center gap-2">
+            <Calendar className="text-muted-foreground h-4 w-4" />
+            <span className="text-sm font-medium">{selectedMonthLabel}</span>
+          </div>
+        </SelectTrigger>
+
+        <SelectContent position="popper">
+          {MONTH_OPTIONS.map((m) => (
+            <SelectItem key={m.value} value={m.value}>
+              {m.label}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
   );
 }

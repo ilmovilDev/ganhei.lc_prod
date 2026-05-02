@@ -1,11 +1,25 @@
-import UnderConstruction from "@/components/shared/under-construction";
-import { requireUserOrRedirect } from "@/lib/auth/require-user-or-redirect";
+import EarningsContent from "@/modules/earning/components/earnings-content";
+import { getCurrentMonth, getCurrentYear } from "@/lib/date/current-period";
+import HeaderPage from "@/components/shared/header/header-page";
 
-export default async function Earnings() {
-  await requireUserOrRedirect();
+interface EarningsPageProps {
+  searchParams: Promise<{ month?: string; year?: string }>;
+}
+
+export default async function EarningsPage({
+  searchParams,
+}: EarningsPageProps) {
+  const { month, year } = await searchParams;
+
+  const currentMonth = month ?? getCurrentMonth();
+  const currentYear = year ?? getCurrentYear();
+
   return (
-    <>
-      <UnderConstruction showBack />;
-    </>
+    <div className="flex h-full flex-col gap-y-4 overflow-hidden p-4">
+      <HeaderPage month={currentMonth} year={currentYear} />
+      <div className="px-4">
+        <EarningsContent month={currentMonth} year={currentYear} />
+      </div>
+    </div>
   );
 }

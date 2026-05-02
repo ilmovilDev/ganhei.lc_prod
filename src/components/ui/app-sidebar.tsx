@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { usePathname } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 import {
   Sidebar,
   SidebarContent,
@@ -51,8 +51,26 @@ export const menuItems: MenuItem[] = [
   },
 ];
 
+function buildHref(
+  baseUrl: string,
+  params: { month?: string | null; year?: string | null },
+): string {
+  const searchParams = new URLSearchParams();
+
+  if (params.month) searchParams.set("month", params.month);
+  if (params.year) searchParams.set("year", params.year);
+
+  const query = searchParams.toString();
+
+  return query ? `${baseUrl}?${query}` : baseUrl;
+}
+
 export function AppSidebar() {
   const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const month = searchParams.get("month");
+  const year = searchParams.get("year");
+
   return (
     <Sidebar>
       <SidebarHeader>
@@ -71,11 +89,14 @@ export function AppSidebar() {
             {menuItems.map((item) => {
               const Icon = item.icon;
               const isActive = pathname === item.url;
+              const href = buildHref(item.url, { month, year });
 
               return (
                 <SidebarMenuItem key={item.url}>
                   <SidebarMenuButton asChild isActive={isActive}>
-                    <Link href={item.url}>
+                    <Link href={href}>
+                      {" "}
+                      {/* 👈 href em vez de item.url */}
                       <Icon className="mr-2 h-4 w-4" />
                       {item.title}
                     </Link>

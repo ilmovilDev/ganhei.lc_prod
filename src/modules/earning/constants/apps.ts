@@ -1,63 +1,30 @@
-import { LucideIcon } from "lucide-react";
-import { Car, Bike, Package, Store, MoreHorizontal } from "lucide-react";
 import { App } from "@/generated/prisma/client";
 
 type AppConfig = {
   value: App;
   label: string;
-  icon: LucideIcon;
 };
 
 export const Apps = [
-  {
-    value: "UBER",
-    label: "Uber",
-    icon: Car,
-  },
-  {
-    value: "NINETY_NINE",
-    label: "99",
-    icon: Car,
-  },
-  {
-    value: "INDRIVE",
-    label: "inDrive",
-    icon: Car,
-  },
-
-  // FOOD DELIVERY
-  {
-    value: "IFOOD",
-    label: "iFood",
-    icon: Bike,
-  },
-  {
-    value: "NINETY_NINE_FOOD",
-    label: "99 Food",
-    icon: Bike,
-  },
-
-  // GENERIC DELIVERY
-  {
-    value: "GENERIC_DELIVERY",
-    label: "Entrega",
-    icon: Package,
-  },
-
-  // MARKETPLACE
-  {
-    value: "SHOPEE",
-    label: "Shopee",
-    icon: Store,
-  },
-
-  // FALLBACK
-  {
-    value: "OTHER",
-    label: "Outro",
-    icon: MoreHorizontal,
-  },
+  { value: "UBER", label: "Uber" },
+  { value: "NINETY_NINE", label: "99" },
+  { value: "INDRIVE", label: "inDrive" },
+  { value: "IFOOD", label: "iFood" },
+  { value: "NINETY_NINE_FOOD", label: "99Food" },
+  { value: "SHOPEE", label: "Shopee" },
+  { value: "GENERIC_DELIVERY", label: "Entrega" },
+  { value: "OTHER", label: "Outro" },
 ] as const satisfies ReadonlyArray<AppConfig>;
 
-// ---------------------------------------------
+export const APP_LABELS: Record<App, string> = {
+  UBER: "Uber",
+  NINETY_NINE: "99",
+  INDRIVE: "inDrive",
+  IFOOD: "iFood",
+  NINETY_NINE_FOOD: "99Food",
+  SHOPEE: "Shopee",
+  GENERIC_DELIVERY: "Entrega",
+  OTHER: "Outro",
+};
+
 export type AppOption = (typeof Apps)[number];
