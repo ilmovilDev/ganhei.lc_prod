@@ -115,7 +115,7 @@ export default function TimeSelect({ month, year }: TimeSelectProps) {
       >
         <SelectTrigger
           className={cn(
-            "h-10 w-24",
+            "h-10 w-full md:w-fit",
             "bg-background border px-2 shadow-sm",
             isPending && "opacity-70",
           )}
