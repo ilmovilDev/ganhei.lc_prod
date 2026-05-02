@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import DashboardMetricsContent from "@/modules/dashboard/components/dashboard-metrics-content";
 import { getCurrentMonth, getCurrentYear } from "@/lib/date/current-period";
 import HeaderPage from "@/components/shared/header/header-page";
@@ -17,9 +16,7 @@ export default async function DashboardPage({
 
   return (
     <div className="flex h-full flex-col gap-y-4 overflow-hidden p-4">
-      <Suspense fallback={null}>
-        <HeaderPage month={currentMonth} year={currentYear} />
-      </Suspense>
+      <HeaderPage month={currentMonth} year={currentYear} />
       <DashboardMetricsContent month={currentMonth} year={currentYear} />
     </div>
   );

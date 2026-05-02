@@ -106,7 +106,7 @@ export default function EarningsTable({ data }: EarningsTableProps) {
       {/* ── TABLE ──────────────────────────────────────────────────────────── */}
       <div className="rounded-lg border">
         <Table className="w-full table-fixed">
-          <TableHeader className="">
+          <TableHeader>
             {table.getHeaderGroups().map((hg) => (
               <TableRow key={hg.id} className="hover:bg-transparent">
                 {hg.headers.map((header) => (

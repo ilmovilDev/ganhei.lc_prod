@@ -13,7 +13,7 @@ export default function ProtectedLayout({
       <Suspense fallback={null}>
         <AppSidebar />
       </Suspense>
-      <main className="no-scrollbar flex w-full flex-1 flex-col overflow-auto">
+      <main className="no-scrollbar flex w-full flex-1 flex-col overflow-auto p-4">
         <Header />
         {children}
       </main>

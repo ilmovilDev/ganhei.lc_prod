@@ -1,4 +1,3 @@
-import { Suspense } from "react";
 import EarningsContent from "@/modules/earning/components/earnings-content";
 import { getCurrentMonth, getCurrentYear } from "@/lib/date/current-period";
 import HeaderPage from "@/components/shared/header/header-page";
@@ -17,9 +16,7 @@ export default async function EarningsPage({
 
   return (
     <div className="flex h-full flex-col gap-y-4 overflow-hidden p-4">
-      <Suspense fallback={null}>
-        <HeaderPage month={currentMonth} year={currentYear} />
-      </Suspense>
+      <HeaderPage month={currentMonth} year={currentYear} />
       <div className="px-4">
         <EarningsContent month={currentMonth} year={currentYear} />
       </div>
